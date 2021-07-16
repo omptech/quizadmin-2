@@ -26,24 +26,24 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
 import java.util.Map;
 
-public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
+public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ViewHolder> {
 
-    private List<CategoryModel> cat_list;
+    private List<ClassModel> cat_list;
 
-    public CategoryAdapter(List<CategoryModel> cat_list) {
+    public ClassAdapter(List<ClassModel> cat_list) {
         this.cat_list = cat_list;
     }
 
     @NonNull
     @Override
-    public CategoryAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.cat_item_layout,viewGroup,false);
+    public ClassAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.class_item_layout,viewGroup,false);
 
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CategoryAdapter.ViewHolder viewHolder, int pos) {
+    public void onBindViewHolder(@NonNull ClassAdapter.ViewHolder viewHolder, int pos) {
 
         String title = cat_list.get(pos).getName();
 
@@ -78,7 +78,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 
             editDialog = new Dialog(itemView.getContext());
-            editDialog.setContentView(R.layout.edit_category_dialog);
+            editDialog.setContentView(R.layout.edit_class_dialog);
             editDialog.setCancelable(true);
             editDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -86,7 +86,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             updateCatB = editDialog.findViewById(R.id.ec_add_btn);
         }
 
-        private void setData(String title, final int pos, final CategoryAdapter adapter)
+        private void setData(String title, final int pos, final ClassAdapter adapter)
         {
             catName.setText(title);
 
@@ -94,8 +94,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 @Override
                 public void onClick(View v) {
 
-                    CategoryActivity.selected_cat_index = pos;
-                    Intent intent = new Intent(itemView.getContext(),SetsActivity.class);
+                    ClassActivity.selected_cat_index = pos;
+                    Intent intent = new Intent(itemView.getContext(), SubjectActivity.class);
                     itemView.getContext().startActivity(intent);
                 }
             });
@@ -156,7 +156,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
         }
 
-        private void deleteCategory(final int id, final Context context, final CategoryAdapter adapter)
+        private void deleteCategory(final int id, final Context context, final ClassAdapter adapter)
         {
             loadingDialog.show();
 
@@ -186,7 +186,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
                             Toast.makeText(context,"Category deleted successfully",Toast.LENGTH_SHORT).show();
 
-                            CategoryActivity.catList.remove(id);
+                            ClassActivity.catList.remove(id);
 
                             adapter.notifyDataSetChanged();
 
@@ -205,7 +205,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
         }
 
-        private void updateCategory(final String catNewName, final int pos, final Context context, final CategoryAdapter adapter)
+        private void updateCategory(final String catNewName, final int pos, final Context context, final ClassAdapter adapter)
         {
             editDialog.dismiss();
 
@@ -232,7 +232,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                                         public void onSuccess(Void aVoid) {
 
                                             Toast.makeText(context,"Category Name Changed Successfully",Toast.LENGTH_SHORT).show();
-                                            CategoryActivity.catList.get(pos).setName(catNewName);
+                                            ClassActivity.catList.get(pos).setName(catNewName);
                                             adapter.notifyDataSetChanged();
 
                                             loadingDialog.dismiss();

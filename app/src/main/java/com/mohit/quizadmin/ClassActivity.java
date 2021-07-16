@@ -1,7 +1,6 @@
 package com.mohit.quizadmin;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,12 +8,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.ArrayMap;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,39 +25,39 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CategoryActivity extends AppCompatActivity {
+public class ClassActivity extends AppCompatActivity {
 
     private RecyclerView cat_recycler_view;
     private Button addCatB;
-    public static List<CategoryModel> catList = new ArrayList<>();
+    public static List<ClassModel> catList = new ArrayList<>();
     public static int selected_cat_index=0;
 
     private FirebaseFirestore firestore;
     private Dialog loadingDialog, addCatDialog;
     private EditText dialogCatName;
     private Button dialogAddB;
-    private CategoryAdapter adapter;
+    private ClassAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_category);
+        setContentView(R.layout.activity_class);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Categories");
+        getSupportActionBar().setTitle("Class");
 
 
         cat_recycler_view = findViewById(R.id.cat_recycler);
         addCatB = findViewById(R.id.addCatB);
 
-        loadingDialog = new Dialog(CategoryActivity.this);
+        loadingDialog = new Dialog(ClassActivity.this);
         loadingDialog.setContentView(R.layout.loading_progressbar);
         loadingDialog.setCancelable(false);
         loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progress_background);
         loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        addCatDialog = new Dialog(CategoryActivity.this);
+        addCatDialog = new Dialog(ClassActivity.this);
         addCatDialog.setContentView(R.layout.add_category_dialog);
         addCatDialog.setCancelable(true);
         addCatDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -83,7 +80,7 @@ public class CategoryActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(dialogCatName.getText().toString().isEmpty())
                 {
-                    dialogCatName.setError("Enter Category Name");
+                    dialogCatName.setError("Enter Class Name");
                     return;
                 }
 
@@ -125,16 +122,16 @@ public class CategoryActivity extends AppCompatActivity {
                             String catName = doc.getString("CAT" + String.valueOf(i) + "_NAME");
                             String catid = doc.getString("CAT" + String.valueOf(i) + "_ID");
 
-                            catList.add(new CategoryModel(catid,catName,"0","1"));
+                            catList.add(new ClassModel(catid,catName,"0","1"));
                         }
 
-                        adapter = new CategoryAdapter(catList);
+                        adapter = new ClassAdapter(catList);
                         cat_recycler_view.setAdapter(adapter);
 
                     }
                     else
                     {
-                        Toast.makeText(CategoryActivity.this,"No Category Document Exists!",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ClassActivity.this,"No Category Document Exists!",Toast.LENGTH_SHORT).show();
                         finish();
                     }
 
@@ -142,7 +139,7 @@ public class CategoryActivity extends AppCompatActivity {
                 else
                 {
 
-                    Toast.makeText(CategoryActivity.this,task.getException().getMessage(),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ClassActivity.this,task.getException().getMessage(),Toast.LENGTH_SHORT).show();
                 }
 
                 loadingDialog.dismiss();
@@ -181,9 +178,9 @@ public class CategoryActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
 
-                                        Toast.makeText(CategoryActivity.this,"Category added successfully",Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ClassActivity.this,"Category added successfully",Toast.LENGTH_SHORT).show();
 
-                                        catList.add(new CategoryModel(doc_id,title,"0","1"));
+                                        catList.add(new ClassModel(doc_id,title,"0","1"));
 
                                         adapter.notifyItemInserted(catList.size());
 
@@ -194,7 +191,7 @@ public class CategoryActivity extends AppCompatActivity {
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(CategoryActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ClassActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                                         loadingDialog.dismiss();
                                     }
                                 });
@@ -205,7 +202,7 @@ public class CategoryActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(CategoryActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ClassActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                         loadingDialog.dismiss();
                     }
                 });

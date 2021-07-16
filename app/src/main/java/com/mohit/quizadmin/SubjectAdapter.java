@@ -27,28 +27,27 @@ import com.google.firebase.firestore.WriteBatch;
 import java.util.List;
 import java.util.Map;
 
-import static com.mohit.quizadmin.CategoryActivity.catList;
-import static com.mohit.quizadmin.CategoryActivity.selected_cat_index;
-import static com.mohit.quizadmin.SetsActivity.selected_set_index;
+import static com.mohit.quizadmin.ClassActivity.catList;
+import static com.mohit.quizadmin.ClassActivity.selected_cat_index;
 
-public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
+public class SubjectAdapter extends RecyclerView.Adapter<SubjectAdapter.ViewHolder> {
 
     private List<String> setIDs;
 
-    public SetAdapter(List<String> setIDs) {
+    public SubjectAdapter(List<String> setIDs) {
         this.setIDs = setIDs;
     }
 
 
     @NonNull
     @Override
-    public SetAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.cat_item_layout,viewGroup,false);
+    public SubjectAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.class_item_layout,viewGroup,false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SetAdapter.ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull SubjectAdapter.ViewHolder viewHolder, int i) {
 
         String setID = setIDs.get(i);
         viewHolder.setData(i, setID, this);
@@ -78,18 +77,18 @@ public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
             loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         }
 
-        private void setData(final int pos, final String setID, final SetAdapter adapter)
+        private void setData(final int pos, final String setID, final SubjectAdapter adapter)
         {
-            setName.setText("SET " + String.valueOf(pos + 1));
+            setName.setText(setID);
 
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    selected_set_index = pos;
+                    SubjectActivity.selected_set_index = pos;
 
-                    Intent intent = new Intent(itemView.getContext(),QuestionsActivity.class);
+                    Intent intent = new Intent(itemView.getContext(), ChapterActivity.class);
                     itemView.getContext().startActivity(intent);
                 }
             });
@@ -125,7 +124,7 @@ public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
         }
 
 
-        private void deleteSet(final int pos, String setID, final Context context, final SetAdapter adapter)
+        private void deleteSet(final int pos, String setID, final Context context, final SubjectAdapter adapter)
         {
             loadingDialog.show();
 
@@ -168,9 +167,9 @@ public class SetAdapter extends RecyclerView.Adapter<SetAdapter.ViewHolder> {
                                                 public void onSuccess(Void aVoid) {
                                                     Toast.makeText(context,"Set deleted Sucesfully",Toast.LENGTH_SHORT).show();
 
-                                                    SetsActivity.setsIDs.remove(pos);
+                                                    SubjectActivity.setsIDs.remove(pos);
 
-                                                    catList.get(selected_cat_index).setNoOfSets(String.valueOf(SetsActivity.setsIDs.size()));
+                                                    catList.get(selected_cat_index).setNoOfSets(String.valueOf(SubjectActivity.setsIDs.size()));
 
                                                     adapter.notifyDataSetChanged();
 

@@ -19,15 +19,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Map;
 
-import static com.mohit.quizadmin.CategoryActivity.catList;
-import static com.mohit.quizadmin.CategoryActivity.selected_cat_index;
-import static com.mohit.quizadmin.QuestionsActivity.quesList;
-import static com.mohit.quizadmin.SetsActivity.selected_set_index;
-import static com.mohit.quizadmin.SetsActivity.setsIDs;
+import static com.mohit.quizadmin.ClassActivity.catList;
+import static com.mohit.quizadmin.ClassActivity.selected_cat_index;
+import static com.mohit.quizadmin.ChapterActivity.quesList;
+import static com.mohit.quizadmin.SubjectActivity.selected_set_index;
+import static com.mohit.quizadmin.SubjectActivity.setsIDs;
 
-public class QuestionDetailsActivity extends AppCompatActivity {
+public class ChapterDetailsActivity extends AppCompatActivity {
 
-    private EditText ques, optionA, optionB, optionC, optionD, answer;
+    private EditText ques;
     private Button addQB;
     private String qStr, aStr, bStr, cStr, dStr, ansStr;
     private Dialog loadingDialog;
@@ -38,7 +38,7 @@ public class QuestionDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_question_details);
+        setContentView(R.layout.activity_chapter_details);
 
         Toolbar toolbar = findViewById(R.id.qdetails_toolbar);
         setSupportActionBar(toolbar);
@@ -46,14 +46,9 @@ public class QuestionDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ques = findViewById(R.id.question);
-        optionA = findViewById(R.id.optionA);
-        optionB = findViewById(R.id.optionB);
-        optionC = findViewById(R.id.optionC);
-        optionD = findViewById(R.id.optionD);
-        answer = findViewById(R.id.answer);
         addQB = findViewById(R.id.addQB);
 
-        loadingDialog = new Dialog(QuestionDetailsActivity.this);
+        loadingDialog = new Dialog(ChapterDetailsActivity.this);
         loadingDialog.setContentView(R.layout.loading_progressbar);
         loadingDialog.setCancelable(false);
         loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progress_background);
@@ -81,39 +76,12 @@ public class QuestionDetailsActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 qStr = ques.getText().toString();
-                aStr = optionA.getText().toString();
-                bStr = optionB.getText().toString();
-                cStr = optionC.getText().toString();
-                dStr = optionD.getText().toString();
-                ansStr = answer.getText().toString();
+
 
                 if(qStr.isEmpty()) {
                     ques.setError("Enter Question");
                     return;
                 }
-
-                if(aStr.isEmpty()) {
-                    optionA.setError("Enter option A");
-                    return;
-                }
-
-                if(bStr.isEmpty()) {
-                    optionB.setError("Enter option B ");
-                    return;
-                }
-                if(cStr.isEmpty()) {
-                    optionC.setError("Enter option C");
-                    return;
-                }
-                if(dStr.isEmpty()) {
-                    optionD.setError("Enter option D");
-                    return;
-                }
-                if(ansStr.isEmpty()) {
-                    answer.setError("Enter correct answer");
-                    return;
-                }
-
                 if(action.compareTo("EDIT") == 0)
                 {
                     editQuestion();
@@ -134,11 +102,7 @@ public class QuestionDetailsActivity extends AppCompatActivity {
         Map<String,Object> quesData = new ArrayMap<>();
 
         quesData.put("QUESTION",qStr);
-        quesData.put("A",aStr);
-        quesData.put("B",bStr);
-        quesData.put("C",cStr);
-        quesData.put("D",dStr);
-        quesData.put("ANSWER",ansStr);
+
 
 
         final String doc_id = firestore.collection("QUIZ").document(catList.get(selected_cat_index).getId())
@@ -161,21 +125,21 @@ public class QuestionDetailsActivity extends AppCompatActivity {
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Toast.makeText(QuestionDetailsActivity.this, " Question Added Successfully", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ChapterDetailsActivity.this, " Question Added Successfully", Toast.LENGTH_SHORT).show();
 
-                                        quesList.add(new QuestionModel(
+                                        quesList.add(new ChapterModel(
                                                 doc_id,
-                                                qStr,aStr,bStr,cStr,dStr, Integer.valueOf(ansStr)
+                                                qStr
                                         ));
 
                                         loadingDialog.dismiss();
-                                        QuestionDetailsActivity.this.finish();
+                                        ChapterDetailsActivity.this.finish();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(QuestionDetailsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ChapterDetailsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                                         loadingDialog.dismiss();
                                     }
                                 });
@@ -186,7 +150,7 @@ public class QuestionDetailsActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(QuestionDetailsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChapterDetailsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                         loadingDialog.dismiss();
                     }
                 });
@@ -197,11 +161,6 @@ public class QuestionDetailsActivity extends AppCompatActivity {
     private void loadData(int id)
     {
         ques.setText(quesList.get(id).getQuestion());
-        optionA.setText(quesList.get(id).getOptionA());
-        optionB.setText(quesList.get(id).getOptionB());
-        optionC.setText(quesList.get(id).getOptionC());
-        optionD.setText(quesList.get(id).getOptionD());
-        answer.setText(String.valueOf(quesList.get(id).getCorrectAns()));
     }
 
 
@@ -211,11 +170,6 @@ public class QuestionDetailsActivity extends AppCompatActivity {
 
         Map<String,Object> quesData = new ArrayMap<>();
         quesData.put("QUESTION", qStr);
-        quesData.put("A",aStr);
-        quesData.put("B",bStr);
-        quesData.put("C",cStr);
-        quesData.put("D",dStr);
-        quesData.put("ANSWER",ansStr);
 
 
         firestore.collection("QUIZ").document(catList.get(selected_cat_index).getId())
@@ -225,24 +179,20 @@ public class QuestionDetailsActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        Toast.makeText(QuestionDetailsActivity.this,"Question updated successfully",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChapterDetailsActivity.this,"Question updated successfully",Toast.LENGTH_SHORT).show();
 
                         quesList.get(qID).setQuestion(qStr);
-                        quesList.get(qID).setOptionA(aStr);
-                        quesList.get(qID).setOptionB(bStr);
-                        quesList.get(qID).setOptionC(cStr);
-                        quesList.get(qID).setOptionD(dStr);
-                        quesList.get(qID).setCorrectAns(Integer.valueOf(ansStr));
+
 
                         loadingDialog.dismiss();
-                        QuestionDetailsActivity.this.finish();
+                        ChapterDetailsActivity.this.finish();
 
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(QuestionDetailsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChapterDetailsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                         loadingDialog.dismiss();
                     }
                 });

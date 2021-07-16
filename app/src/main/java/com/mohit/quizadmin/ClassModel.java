@@ -1,13 +1,13 @@
 package com.mohit.quizadmin;
 
-public class CategoryModel {
+public class ClassModel {
 
     private String id;
     private String name;
     private String noOfSets;
     private String setCounter;
 
-    public CategoryModel(String id, String name, String noOfSets, String setCounter) {
+    public ClassModel(String id, String name, String noOfSets, String setCounter) {
         this.id = id;
         this.name = name;
         this.noOfSets = noOfSets;

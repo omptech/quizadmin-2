@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -26,35 +25,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.mohit.quizadmin.CategoryActivity.catList;
-import static com.mohit.quizadmin.CategoryActivity.selected_cat_index;
-import static com.mohit.quizadmin.SetsActivity.selected_set_index;
-import static com.mohit.quizadmin.SetsActivity.setsIDs;
+import static com.mohit.quizadmin.ClassActivity.catList;
+import static com.mohit.quizadmin.ClassActivity.selected_cat_index;
+import static com.mohit.quizadmin.SubjectActivity.selected_set_index;
+import static com.mohit.quizadmin.SubjectActivity.setsIDs;
 
-public class QuestionsActivity extends AppCompatActivity {
+public class ChapterActivity extends AppCompatActivity {
 
     private RecyclerView quesView;
     private Button addQB;
-    public static List<QuestionModel> quesList = new ArrayList<>();
-    private QuestionAdapter adapter;
+    public static List<ChapterModel> quesList = new ArrayList<>();
+    private ChapterAdapter adapter;
     private FirebaseFirestore firestore;
     private Dialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_questions);
+        setContentView(R.layout.activity_chapters);
 
         Toolbar toolbar = findViewById(R.id.q_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Questions");
+        getSupportActionBar().setTitle("Chapters");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         quesView = findViewById(R.id.quest_recycler);
         addQB = findViewById(R.id.addQB);
 
-        loadingDialog = new Dialog(QuestionsActivity.this);
+        loadingDialog = new Dialog(ChapterActivity.this);
         loadingDialog.setContentView(R.layout.loading_progressbar);
         loadingDialog.setCancelable(false);
         loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progress_background);
@@ -63,7 +62,7 @@ public class QuestionsActivity extends AppCompatActivity {
         addQB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(QuestionsActivity.this, QuestionDetailsActivity.class);
+                Intent intent = new Intent(ChapterActivity.this, ChapterDetailsActivity.class);
                 intent.putExtra("ACTION","ADD");
                 startActivity(intent);
             }
@@ -108,19 +107,14 @@ public class QuestionsActivity extends AppCompatActivity {
 
                             QueryDocumentSnapshot quesDoc = docList.get(quesID);
 
-                            quesList.add(new QuestionModel(
+                            quesList.add(new ChapterModel(
                                     quesID,
-                                    quesDoc.getString("QUESTION"),
-                                    quesDoc.getString("A"),
-                                    quesDoc.getString("B"),
-                                    quesDoc.getString("C"),
-                                    quesDoc.getString("D"),
-                                    Integer.valueOf(quesDoc.getString("ANSWER"))
+                                    quesDoc.getString("QUESTION")
                             ));
 
                         }
 
-                        adapter = new QuestionAdapter(quesList);
+                        adapter = new ChapterAdapter(quesList);
                         quesView.setAdapter(adapter);
 
                         loadingDialog.dismiss();
@@ -130,7 +124,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(QuestionsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChapterActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                         loadingDialog.dismiss();
                     }
                 });

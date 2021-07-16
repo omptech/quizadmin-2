@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -23,16 +24,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.mohit.quizadmin.CategoryActivity.catList;
-import static com.mohit.quizadmin.CategoryActivity.selected_cat_index;
+import static com.mohit.quizadmin.ClassActivity.catList;
+import static com.mohit.quizadmin.ClassActivity.selected_cat_index;
 
-public class SetsActivity extends AppCompatActivity {
+public class SubjectActivity extends AppCompatActivity {
 
     private RecyclerView setsView;
     private Button addSetB;
-    private SetAdapter adapter;
+    private EditText dialogSetName;
+    private Button dialogAddB;
+    private SubjectAdapter adapter;
     private FirebaseFirestore firestore;
-    private Dialog loadingDialog;
+    private Dialog loadingDialog, addSetDialog;
 
     public static List<String> setsIDs = new ArrayList<>();
     public static int selected_set_index=0;
@@ -40,34 +43,56 @@ public class SetsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sets);
+        setContentView(R.layout.activity_subject);
 
         Toolbar toolbar = findViewById(R.id.sa_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Sets");
+        getSupportActionBar().setTitle("Subjects");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setsView = findViewById(R.id.sets_recycler);
         addSetB = findViewById(R.id.addSetB);
 
-        loadingDialog = new Dialog(SetsActivity.this);
+        loadingDialog = new Dialog(SubjectActivity.this);
         loadingDialog.setContentView(R.layout.loading_progressbar);
         loadingDialog.setCancelable(false);
         loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progress_background);
         loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        addSetB.setText("ADD NEW SET");
+
+
+        addSetDialog = new Dialog(SubjectActivity.this);
+        addSetDialog.setContentView(R.layout.add_category_dialog);
+        addSetDialog.setCancelable(true);
+        addSetDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        dialogSetName = addSetDialog.findViewById(R.id.ac_cat_name);
+        dialogAddB = addSetDialog.findViewById(R.id.ac_add_btn);
+
+        firestore = FirebaseFirestore.getInstance();
 
         addSetB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                addNewSet();
+                dialogSetName.getText().clear();
+                addSetDialog.show();
             }
         });
 
-        firestore = FirebaseFirestore.getInstance();
+        dialogAddB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(dialogSetName.getText().toString().isEmpty())
+                {
+                    dialogSetName.setError("Enter Subject Name");
+                    return;
+                }
+
+                addNewSet(dialogSetName.getText().toString());
+            }
+        });
+
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -99,7 +124,7 @@ public class SetsActivity extends AppCompatActivity {
                 catList.get(selected_cat_index).setSetCounter(documentSnapshot.getString("COUNTER"));
                 catList.get(selected_cat_index).setNoOfSets(String.valueOf(noOfSets));
 
-                adapter = new SetAdapter(setsIDs);
+                adapter = new SubjectAdapter(setsIDs);
                 setsView.setAdapter(adapter);
 
                 loadingDialog.dismiss();
@@ -109,14 +134,14 @@ public class SetsActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(SetsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SubjectActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                         loadingDialog.dismiss();
                     }
                 });
 
     }
 
-    private void addNewSet()
+    private void addNewSet(final String title)
     {
         loadingDialog.show();
 
@@ -127,7 +152,7 @@ public class SetsActivity extends AppCompatActivity {
         qData.put("COUNT","0");
 
         firestore.collection("QUIZ").document(curr_cat_id)
-                .collection(curr_counter).document("QUESTIONS_LIST")
+                .collection(title).document("QUESTIONS_LIST")
                 .set(qData)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -135,7 +160,7 @@ public class SetsActivity extends AppCompatActivity {
 
                         Map<String,Object> catDoc = new ArrayMap<>();
                         catDoc.put("COUNTER", String.valueOf(Integer.valueOf(curr_counter) + 1)  );
-                        catDoc.put("SET" + String.valueOf(setsIDs.size() + 1) + "_ID", curr_counter);
+                        catDoc.put("SET" + String.valueOf(setsIDs.size() + 1) + "_ID", title);
                         catDoc.put("SETS", setsIDs.size() + 1);
 
                         firestore.collection("QUIZ").document(curr_cat_id)
@@ -144,7 +169,7 @@ public class SetsActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
 
-                                        Toast.makeText(SetsActivity.this, " Set Added Successfully",Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(SubjectActivity.this, " Set Added Successfully",Toast.LENGTH_SHORT).show();
 
                                         setsIDs.add(curr_counter);
                                         catList.get(selected_cat_index).setNoOfSets(String.valueOf(setsIDs.size()));
@@ -158,7 +183,7 @@ public class SetsActivity extends AppCompatActivity {
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(SetsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(SubjectActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                                         loadingDialog.dismiss();
                                     }
                                 });
@@ -168,7 +193,7 @@ public class SetsActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(SetsActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SubjectActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
                         loadingDialog.dismiss();
                     }
                 });

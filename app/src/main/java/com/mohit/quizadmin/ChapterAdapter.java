@@ -24,32 +24,33 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
 import java.util.Map;
 
-import static com.mohit.quizadmin.CategoryActivity.catList;
-import static com.mohit.quizadmin.CategoryActivity.selected_cat_index;
-import static com.mohit.quizadmin.QuestionsActivity.quesList;
-import static com.mohit.quizadmin.SetsActivity.selected_set_index;
-import static com.mohit.quizadmin.SetsActivity.setsIDs;
+import static com.mohit.quizadmin.ClassActivity.catList;
+import static com.mohit.quizadmin.ClassActivity.selected_cat_index;
+import static com.mohit.quizadmin.ChapterActivity.quesList;
+import static com.mohit.quizadmin.SubjectActivity.selected_set_index;
+import static com.mohit.quizadmin.SubjectActivity.setsIDs;
 
-public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHolder> {
+public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHolder> {
 
-    private List<QuestionModel> ques_list;
+    private List<ChapterModel> ques_list;
 
-    public QuestionAdapter(List<QuestionModel> ques_list) {
+    public ChapterAdapter(List<ChapterModel> ques_list) {
         this.ques_list = ques_list;
     }
 
     @NonNull
     @Override
-    public QuestionAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+    public ChapterAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.cat_item_layout, viewGroup,false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.class_item_layout, viewGroup,false);
 
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull QuestionAdapter.ViewHolder viewHolder, int pos) {
-        viewHolder.setData(pos, this);
+    public void onBindViewHolder(@NonNull ChapterAdapter.ViewHolder viewHolder, int pos) {
+        String title = ques_list.get(pos).getQuestion();
+        viewHolder.setData(pos, this,title);
     }
 
     @Override
@@ -76,14 +77,14 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
             loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         }
 
-        private void setData(final int pos, final QuestionAdapter adapter)
+        private void setData(final int pos, final ChapterAdapter adapter, String s)
         {
-            title.setText("QUESTION " +  String.valueOf(pos+1));
+            title.setText(s);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(itemView.getContext(),QuestionDetailsActivity.class);
+                    Intent intent = new Intent(itemView.getContext(), ChapterDetailsActivity.class);
                     intent.putExtra("ACTION","EDIT");
                     intent.putExtra("Q_ID", pos);
                     itemView.getContext().startActivity(intent);
@@ -120,7 +121,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
             });
         }
 
-        private void deleteQuestion(final int pos, final Context context, final QuestionAdapter adapter)
+        private void deleteQuestion(final int pos, final Context context, final ChapterAdapter adapter)
         {
             loadingDialog.show();
 
