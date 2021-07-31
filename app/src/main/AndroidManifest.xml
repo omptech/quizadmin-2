@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ChapterDetailsActivity"></activity>
+        <activity android:name=".SetAdapter"></activity>
         <activity android:name=".ChapterModel" />
         <activity android:name=".ChapterActivity" />
         <activity android:name=".SubjectActivity" />

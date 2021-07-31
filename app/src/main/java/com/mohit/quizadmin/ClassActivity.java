@@ -45,7 +45,7 @@ public class ClassActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Class");
+        getSupportActionBar().setTitle("Chapter");
 
 
         cat_recycler_view = findViewById(R.id.cat_recycler);

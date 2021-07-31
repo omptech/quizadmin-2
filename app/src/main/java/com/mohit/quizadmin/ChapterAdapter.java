@@ -81,15 +81,15 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ViewHold
         {
             title.setText(s);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(itemView.getContext(), ChapterDetailsActivity.class);
-                    intent.putExtra("ACTION","EDIT");
-                    intent.putExtra("Q_ID", pos);
-                    itemView.getContext().startActivity(intent);
-                }
-            });
+//            itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent intent = new Intent(itemView.getContext(), ChapterDetailsActivity.class);
+//                    intent.putExtra("ACTION","EDIT");
+//                    intent.putExtra("Q_ID", pos);
+//                    itemView.getContext().startActivity(intent);
+//                }
+//            });
 
             deleteB.setOnClickListener(new View.OnClickListener() {
                 @Override

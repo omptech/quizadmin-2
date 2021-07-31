@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -37,21 +38,23 @@ public class ChapterActivity extends AppCompatActivity {
     public static List<ChapterModel> quesList = new ArrayList<>();
     private ChapterAdapter adapter;
     private FirebaseFirestore firestore;
-    private Dialog loadingDialog;
+    private Dialog loadingDialog,addQuesDialog;
+    private EditText dialogQuesName;
+    private Button dialogAddB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chapters);
 
-        Toolbar toolbar = findViewById(R.id.q_toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Chapters");
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        quesView = findViewById(R.id.quest_recycler);
-        addQB = findViewById(R.id.addQB);
+        quesView = findViewById(R.id.chap_recycler);
+        addQB = findViewById(R.id.addChapB);
 
         loadingDialog = new Dialog(ChapterActivity.this);
         loadingDialog.setContentView(R.layout.loading_progressbar);
@@ -59,14 +62,45 @@ public class ChapterActivity extends AppCompatActivity {
         loadingDialog.getWindow().setBackgroundDrawableResource(R.drawable.progress_background);
         loadingDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 
+        addQuesDialog = new Dialog(ChapterActivity.this);
+        addQuesDialog.setContentView(R.layout.add_category_dialog);
+        addQuesDialog.setCancelable(true);
+        addQuesDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        dialogQuesName = addQuesDialog.findViewById(R.id.ac_cat_name);
+        dialogAddB = addQuesDialog.findViewById(R.id.ac_add_btn);
+
+        firestore = FirebaseFirestore.getInstance();
+
         addQB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ChapterActivity.this, ChapterDetailsActivity.class);
-                intent.putExtra("ACTION","ADD");
-                startActivity(intent);
+                dialogQuesName.getText().clear();
+                addQuesDialog.show();
             }
         });
+
+        dialogAddB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(dialogQuesName.getText().toString().isEmpty())
+                {
+                    dialogQuesName.setError("Enter Class Name");
+                    return;
+                }
+
+                addNewQuestion(dialogQuesName.getText().toString());
+            }
+        });
+
+//        addQB.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(ChapterActivity.this, ChapterDetailsActivity.class);
+//                intent.putExtra("ACTION","ADD");
+//                startActivity(intent);
+//            }
+//        });
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -128,6 +162,67 @@ public class ChapterActivity extends AppCompatActivity {
                         loadingDialog.dismiss();
                     }
                 });
+
+    }
+    private void addNewQuestion(final String title)
+    {
+        addQuesDialog.dismiss();
+        loadingDialog.show();
+
+        Map<String,Object> quesData = new ArrayMap<>();
+
+        quesData.put("QUESTION",title);
+
+
+
+        final String doc_id = firestore.collection("QUIZ").document(catList.get(selected_cat_index).getId())
+                .collection(setsIDs.get(selected_set_index)).document().getId();
+
+        firestore.collection("QUIZ").document(catList.get(selected_cat_index).getId())
+                .collection(setsIDs.get(selected_set_index)).document(doc_id)
+                .set(quesData)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        Map<String,Object> quesDoc = new ArrayMap<>();
+                        quesDoc.put("Q" + String.valueOf(quesList.size() + 1) + "_ID", doc_id);
+                        quesDoc.put("COUNT",String.valueOf(quesList.size() + 1));
+
+                        firestore.collection("QUIZ").document(catList.get(selected_cat_index).getId())
+                                .collection(setsIDs.get(selected_set_index)).document("QUESTIONS_LIST")
+                                .update(quesDoc)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Toast.makeText(ChapterActivity.this, " Question Added Successfully", Toast.LENGTH_SHORT).show();
+
+                                        quesList.add(new ChapterModel(doc_id,title));
+
+                                        adapter.notifyItemInserted(catList.size());
+
+                                        loadingDialog.dismiss();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(ChapterActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                                        loadingDialog.dismiss();
+                                    }
+                                });
+
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ChapterActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+                        loadingDialog.dismiss();
+                    }
+                });
+
 
     }
 
